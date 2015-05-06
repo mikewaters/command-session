@@ -34,10 +34,11 @@ class CommandError(subprocess.CalledProcessError):
         )
 
 class CommandSession(object):
-    def __init__(self, stream=False):
+    def __init__(self, stream=False, env=None):
         self.log = []
         self._stream = sys.stdout if stream else None
-    
+        self._env = env if env else {}
+
     @property
     def last_returncode(self):
         """Get the return code of the last command exevuted."""
@@ -94,6 +95,7 @@ class CommandSession(object):
 
         p = subprocess.Popen(
             cmd, shell=shell,
+            env=self._env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
