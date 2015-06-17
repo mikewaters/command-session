@@ -14,7 +14,7 @@ requirements = [
 
 setup(
     name='commandsession',
-    version='0.1',
+    version='0.2',
     description="Small session wrapper for subprocess popen helpers.",
     author="Mike Waters",
     author_email='robert.waters@gmail.com',
