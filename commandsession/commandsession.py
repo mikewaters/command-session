@@ -100,7 +100,7 @@ class CommandSession(object):
             stderr=subprocess.STDOUT
         )
         output = []
-        for line in iter(p.stdout.readline, ''):
+        for line in iter(p.stdout.readline, six.binary_type('', 'utf-8')):
             if not shell:
                 # for now, don't write shell=True
                 # code to stdout; typically, it's
@@ -109,7 +109,7 @@ class CommandSession(object):
                 # to see that in the shell
                 self._stream_write(line)
             line = line.strip()
-            output.append(line)
+            output.append(line.decode('utf-8'))
 
         p.wait()
 
