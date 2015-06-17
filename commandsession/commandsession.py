@@ -9,6 +9,7 @@ TODO:
 """
 __all__ = ["CommandError", "CommandSession", "CommandSessionMixin", "ParamDict"]
 
+import os
 import sys
 import six
 import subprocess
@@ -34,10 +35,11 @@ class CommandError(subprocess.CalledProcessError):
         )
 
 class CommandSession(object):
-    def __init__(self, stream=False, env=None):
+    def __init__(self, stream=False, env=None, cwd=None):
         self.log = []
         self._stream = sys.stdout if stream else None
-        self._env = env if env else {}
+        self._env = env
+        self._cwd = cwd
 
     @property
     def last_returncode(self):
@@ -93,11 +95,19 @@ class CommandSession(object):
         if isinstance(cmd, six.string_types):
             shell=True
 
+        popen_kwargs = {
+            'shell': shell,
+            'stdout': subprocess.PIPE,
+            'stderr': subprocess.STDOUT
+        }
+        if self._env:
+            popen_kwargs['env'] = self._env
+
+        if self._cwd:
+            popen_kwargs['cwd'] = self._cwd
+
         p = subprocess.Popen(
-            cmd, shell=shell,
-            env=self._env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT
+            cmd, **popen_kwargs
         )
         output = []
         for line in iter(p.stdout.readline, six.binary_type('', 'utf-8')):
