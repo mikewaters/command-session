@@ -101,15 +101,9 @@ class CommandSession(object):
         )
         output = []
         for line in iter(p.stdout.readline, six.binary_type('', 'utf-8')):
-            if not shell:
-                # for now, don't write shell=True
-                # code to stdout; typically, it's
-                # used because pipe or redirection magics are
-                # needed, in which case we don't need
-                # to see that in the shell
-                self._stream_write(line)
-            line = line.strip()
-            output.append(line.decode('utf-8'))
+            line = line.decode('utf-8').strip()
+            self._stream_write(line)
+            output.append(line)
 
         p.wait()
 
