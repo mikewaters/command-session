@@ -89,6 +89,7 @@ class CommandSession(object):
     def _stream_write(self, line):
         if self._stream:
             self._stream.write(line)
+            self._stream.write(os.linesep)
 
     def _exec(self, cmd):
         shell = False
