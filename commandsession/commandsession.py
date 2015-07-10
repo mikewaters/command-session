@@ -35,11 +35,29 @@ class CommandError(subprocess.CalledProcessError):
         )
 
 class CommandSession(object):
-    def __init__(self, stream=False, env=None, cwd=None):
+    """Wrapper around multiple invocations of subprocess.Popen, tracking
+    and saving execution results and output.
+    Provides methods having similar interface as `subprocess.call()`,
+    `subprocess.check_call()`, and subprocess.check_output()`.
+
+    Params:
+        stream (bool): should output be streamed to stdout, in additin to being
+        captured?
+        env (dict): environment to use, in place of current process environment
+        cwd (str): current working directory to replace `os.cwd()`
+        force_shell (bool): whether or not to force `shell=True` param 
+            to `Popen()`; if the shell (/bin/sh) is required (for instance,
+            if you intend to use a shell builtin), you can force this;
+            normally, `shell` param is only used for commands given as
+            strings (subprocess prefers commands given as lists, which is
+            the default for this module).
+    """
+    def __init__(self, stream=False, env=None, cwd=None, force_shell=False):
         self.log = []
         self._stream = sys.stdout if stream else None
         self._env = env
         self._cwd = cwd
+        self._shell = force_shell
 
     @property
     def last_returncode(self):
@@ -92,7 +110,7 @@ class CommandSession(object):
             self._stream.write(os.linesep)
 
     def _exec(self, cmd):
-        shell = False
+        shell = self._shell
         if isinstance(cmd, six.string_types):
             shell=True
 
